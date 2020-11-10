@@ -44,9 +44,6 @@ var saveTasks = function () {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
-
-
-
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
   // clear values
@@ -146,36 +143,86 @@ $(".list-group").on("click", "span", function () {
 });
 
 //value of due date was changed
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("blur", "input[type='text']", function () {
   //get current text
   var date = $(this)
-  .val()
-  .trim();
+    .val()
+    .trim();
 
   //get the parent ul id attribute 
   var status = $(this)
-  .closest(".list-group")
-  .attr("id")
-  .replace("list-", "");
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
 
   // get the task's position in the list of other li elements
   var index = $(this)
-  .closest(".list-group-item")
-  .index();
+    .closest(".list-group-item")
+    .index();
 
-// update task in array and re-save to localstorage
-tasks[status][index].date = date;
-saveTasks();
+  // update task in array and re-save to localstorage
+  tasks[status][index].date = date;
+  saveTasks();
 
-// recreate span element with bootstrap classes
-var taskSpan = $("<span>")
-  .addClass("badge badge-primary badge-pill")
-  .text(date);
+  // recreate span element with bootstrap classes
+  var taskSpan = $("<span>")
+    .addClass("badge badge-primary badge-pill")
+    .text(date);
 
-// replace input with span element
-$(this).replaceWith(taskSpan);
+  // replace input with span element
+  $(this).replaceWith(taskSpan);
 
 });
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {
+    console.log("activate", this);
+  },
+  deactivate: function (event) {
+    console.log("deactivate", this);
+  },
+  over: function (event) {
+    console.log("over", event.target);
+  },
+  update: function (event) {
+
+    // array to store data task b/c we are updating elements with drag ui and updates need to be saved
+    var tempArr = [];
+    //loop over current set of childen in sortable list
+    //for each child of the ul, li, loop every interation
+    $(this).children().each(function () {
+      var text = $(this)// this now refers to the child element, li. 
+        .find("p")
+        .text()
+        .trim()
+
+      var date = $(this)// child element not the ul
+        .find("span")
+        .text()
+        .trim();
+
+      //add task data to temp array as an object 
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+
+    // trim down list id to match object property
+    var arrName = $(this)
+    .attr("id")
+    .replace("list-", "");
+
+    //update array on task object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
+
 
 
 // remove all tasks
