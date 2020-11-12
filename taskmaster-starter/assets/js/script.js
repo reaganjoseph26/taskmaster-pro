@@ -196,13 +196,22 @@ $(".card .list-group").sortable({
   helper: "clone",
   activate: function (event) {
     console.log("activate", this);
+    $(this).addClass("dropover")
+    $(".bottom-trash").addClass("bottom-trash-drag")
   },
   deactivate: function (event) {
     console.log("deactivate", this);
+    $(this).removeClass("dropover")
+    $(".bottom-trash").removeClass("bottom-trash-drag")
   },
   over: function (event) {
     console.log("over", event.target);
+    $(event.target).addClass("dropover-active");
   },
+  out: function (event) {
+    $(event.target).removeClass("dropover-active")
+  },
+
   update: function (event) {
 
     // array to store data task b/c we are updating elements with drag ui and updates need to be saved
@@ -242,11 +251,14 @@ $("#trash").droppable({
   accept: ".card .list-group-item",
   tolerance: "touch",
   drop: function (event, ui) {
-    ui.draggable.remove();
+    ui.draggable.remove()
+    $(".bottom-trash").addClass("bottom-trash-active")
   },
   over: function (event, ui) {
+    $(".bottom-trash").addClass("bottom-trash-active")
   },
   out: function (event, ui) {
+    $(".bottom-trash").addClass("bottom-trash-active")
   }
 });
 
